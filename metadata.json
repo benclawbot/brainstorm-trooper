@@ -1,0 +1,7 @@
+{
+  "name": "Brainstorm Trooper",
+  "description": "An AI-augmented visual brainstorming workspace that turns fleeting thoughts into structured projects using Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

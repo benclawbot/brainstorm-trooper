@@ -2,19 +2,21 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sparkles, Image as ImageIcon, Globe, Loader2, MessageSquare, GitBranch, FileDown, Search, AlertCircle } from 'lucide-react';
 import { Drop, DropType, MindMapNode, Project, User, ResearchFolder, ProjectFolder, Language } from './types';
-import { expandIdea, researchIdea, generateVisual, generateDeepMindMap } from './services/geminiService';
+import { expandIdea, researchIdea, generateVisual, generateDeepMindMap } from './services/minimaxService';
 import Header from './components/Header';
 import DropBoard from './components/DropBoard';
 import AIChatPanel from './components/AIChatPanel';
 import MindMapPanel from './components/MindMapPanel';
-import Auth from './components/Auth';
 import ProjectSidebar from './components/ProjectSidebar';
 import ResearchDossierSection from './components/ResearchDossierSection';
-import { auth } from './services/firebase';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const user: User = {
+    id: 'local-user',
+    name: 'Local Architect',
+    email: 'local@brainstorm-trooper',
+    photoUrl: 'data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 rx=%2220%22 fill=%22%234f46e5%22/%3E%3Cpath d=%22M21 52V28h13c10 0 16 4 16 12s-6 12-16 12H21zm9-7h5c4 0 6-2 6-5s-2-5-6-5h-5v10z%22 fill=%22white%22/%3E%3C/svg%3E',
+  };
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectFolders, setProjectFolders] = useState<ProjectFolder[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
@@ -31,19 +33,6 @@ const App: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser({
-          id: firebaseUser.uid,
-          name: firebaseUser.displayName || '',
-          email: firebaseUser.email || '',
-          photoUrl: firebaseUser.photoURL || ''
-        });
-      } else {
-        setUser(null);
-      }
-    });
-
     const savedProjects = localStorage.getItem('brainstorm_trooper_projects');
     if (savedProjects) {
       const parsed = JSON.parse(savedProjects);
@@ -67,7 +56,6 @@ const App: React.FC = () => {
     const savedSidebarState = localStorage.getItem('brainstorm_sidebar_collapsed');
     if (savedSidebarState === 'true') setIsSidebarCollapsed(true);
 
-    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -158,13 +146,13 @@ const App: React.FC = () => {
     }
   }, [activeProjectId, activeResearchId]);
 
-  const handleSignIn = (newUser: User) => setUser(newUser);
-  const handleSignOut = async () => {
-    await signOut(auth);
-    setUser(null);
+  const clearWorkspace = () => {
     setProjects([]);
     setProjectFolders([]);
     setActiveProjectId(null);
+    setActiveResearchId(null);
+    localStorage.removeItem('brainstorm_trooper_projects');
+    localStorage.removeItem('brainstorm_trooper_project_folders');
   };
 
   const removeProject = (id: string) => {
@@ -317,7 +305,7 @@ const App: React.FC = () => {
             type: 'image',
             content: text,
             imageUrl: url,
-            tags: ['AI Generated'],
+            tags: ['MiniMax M3 Visual Concept'],
             createdAt: Date.now()
           };
         }
@@ -329,7 +317,7 @@ const App: React.FC = () => {
           title: text,
           content: research.text,
           links: research.links,
-          tags: ['Deep Research'],
+          tags: ['MiniMax M3 Research'],
           createdAt: Date.now()
         };
       }
@@ -537,8 +525,6 @@ const App: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!user) return <Auth onSignIn={handleSignIn} />;
-
   const searchDrops = activeProject?.drops.filter(d => d.type === 'search') || [];
   const otherDrops = activeProject?.drops.filter(d => d.type !== 'search') || [];
 
@@ -563,7 +549,7 @@ const App: React.FC = () => {
         onToggleFolder={toggleProjectFolder}
         onMoveToFolder={moveProjectToFolder}
         onMoveFolderToFolder={moveFolderToFolder}
-        onSignOut={handleSignOut}
+        onResetWorkspace={clearWorkspace}
         isDarkMode={isDarkMode}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={toggleSidebarCollapse}

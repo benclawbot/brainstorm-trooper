@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => onAddDrop('image')} 
                   disabled={loading || !inputValue}
                   className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-pink-400 hover:bg-pink-500/10' : 'text-pink-600 hover:bg-pink-50'}`}
-                  title="Generate Visual"
+                  title="Generate M3 Visual Concept"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
@@ -74,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => onAddDrop('search')} 
                   disabled={loading || !inputValue}
                   className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-emerald-400 hover:bg-emerald-500/10' : 'text-emerald-600 hover:bg-emerald-50'}`}
-                  title="Deep Research"
+                  title="Generate Research Dossier"
                 >
                   <Globe className="w-4 h-4" />
                 </button>

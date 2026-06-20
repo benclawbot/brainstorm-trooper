@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
-import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { ChatMessage, Drop } from '../types';
+import { chatWithWorkspace } from '../services/minimaxService';
 
 interface AIChatPanelProps {
   isOpen: boolean;
@@ -45,24 +45,12 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ isOpen, onClose, drops, isDar
     setIsTyping(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const context = drops.length > 0 
-        ? `Current workspace drops: ${JSON.stringify(drops.map(d => ({ title: d.title, content: d.content })))}`
-        : "The workspace is currently empty.";
-
-      const chat = ai.chats.create({
-        model: 'gemini-3-flash-preview',
-        config: {
-          systemInstruction: `You are Brainstorm Trooper Assistant, a creative partner for brainstorming. Use the workspace context provided. Be concise, inspiring, and helpful. \n\n Context: ${context}`
-        }
-      });
-
-      const response = await chat.sendMessage({ message: input });
+      const response = await chatWithWorkspace(input, messages, drops);
       
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        text: response.text || "I'm sorry, I couldn't process that.",
+        text: response,
         timestamp: Date.now()
       };
 

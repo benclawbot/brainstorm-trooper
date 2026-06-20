@@ -1,6 +1,6 @@
 {
   "name": "Brainstorm Trooper",
-  "description": "An AI-augmented visual brainstorming workspace that turns fleeting thoughts into structured projects using Gemini.",
+  "description": "A local-first brainstorming workspace powered by MiniMax M3 for idea expansion, research dossiers, visual concepts, and interactive mind maps.",
   "requestFramePermissions": [
     "microphone"
   ]

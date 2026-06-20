@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Trash2, ChevronRight, Edit3, Loader2, Download, ChevronDown, ChevronUp, GitBranch, Globe, X, Layers } from 'lucide-react';
 import { MindMapNode, Drop, Language } from '../types';
-import { suggestSubBranches, researchIdea } from '../services/geminiService';
+import { suggestSubBranches, researchIdea } from '../services/minimaxService';
 
 interface MindMapPanelProps {
   isOpen: boolean;

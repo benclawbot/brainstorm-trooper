@@ -26,7 +26,7 @@ const DropBoard: React.FC<DropBoardProps> = ({ drops, onRemove, onStartMindMap, 
   }
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 pb-32 max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 gap-4 pb-24 w-full">
       {drops.map((drop) => (
         <div key={drop.id} className="w-full">
           <DropCard drop={drop} onRemove={onRemove} onStartMindMap={onStartMindMap} isDarkMode={isDarkMode} />

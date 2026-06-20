@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Folder, Clock, Trash2, FolderPlus, ChevronRight, ChevronDown, Edit2, Check, X, GripVertical, MoreVertical, Menu, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react';
+import { Folder, Clock, Trash2, FolderPlus, ChevronRight, ChevronDown, Edit2, Check, GripVertical, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react';
 import { Project, User, ProjectFolder } from '../types';
 
 interface ProjectSidebarProps {
@@ -9,7 +9,6 @@ interface ProjectSidebarProps {
   activeProjectId: string | null;
   onSelectProject: (id: string) => void;
   onRemoveProject: (id: string) => void;
-  onNewProject: () => void;
   onAddFolder: (name: string, parentId?: string) => void;
   onRenameFolder: (id: string, newName: string) => void;
   onDeleteFolder: (id: string) => void;
@@ -30,7 +29,6 @@ const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   activeProjectId, 
   onSelectProject, 
   onRemoveProject,
-  onNewProject, 
   onAddFolder,
   onRenameFolder,
   onDeleteFolder,
@@ -280,18 +278,7 @@ const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         </button>
       </div>
 
-      <div className="p-4 space-y-3">
-        <button 
-          onClick={onNewProject}
-          className={`flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-black transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.97] uppercase tracking-[0.2em] ${isCollapsed ? 'w-12 h-12 rounded-2xl mx-auto' : 'w-full py-4 px-4 rounded-[1.5rem] text-xs'}`}
-          title={isCollapsed ? 'New Stream' : ''}
-        >
-          <Plus className={`${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${!isCollapsed && 'mr-3'}`} />
-          {!isCollapsed && 'New Stream'}
-        </button>
-      </div>
-
-      <div className={`flex-1 overflow-y-auto custom-scrollbar pb-10 ${isCollapsed ? 'px-2' : 'px-4'}`}>
+      <div className={`flex-1 overflow-y-auto custom-scrollbar pb-10 pt-4 ${isCollapsed ? 'px-2' : 'px-4'}`}>
         {!isCollapsed && (
           <div className="flex items-center justify-between mb-6 px-2">
             <h3 className="text-[10px] font-black text-slate-500 dark:text-slate-600 uppercase tracking-[0.4em]">Intelligence History</h3>

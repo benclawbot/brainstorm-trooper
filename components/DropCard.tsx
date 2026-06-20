@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trash2, ExternalLink, Hash, Clock, FileText, Image as ImageIcon, Search, GitBranch, Quote, ChevronRight, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { Trash2, ExternalLink, Hash, Clock, FileText, Image as ImageIcon, Search, GitBranch, Quote, Link as LinkIcon } from 'lucide-react';
 import { Drop } from '../types';
 
 interface DropCardProps {
@@ -119,7 +119,7 @@ const FormattedText: React.FC<{ text: string; isDarkMode: boolean; mode?: 'defau
   }
   flushTable();
 
-  return <div className={`space-y-1`}>{elements}</div>;
+  return <div className="intelligence-report-content space-y-1">{elements}</div>;
 };
 
 const DropCard: React.FC<DropCardProps> = ({ drop, onRemove, onStartMindMap, isDarkMode }) => {
@@ -149,7 +149,7 @@ const DropCard: React.FC<DropCardProps> = ({ drop, onRemove, onStartMindMap, isD
 
       <div className={`p-10 flex-1 transition-colors ${isDarkMode ? '' : 'bg-white'}`}>
         {drop.title && (
-          <h3 className={`text-2xl font-black mb-8 leading-tight tracking-tighter transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'} ${isNote ? 'border-l-4 border-indigo-600 pl-6' : 'text-center uppercase tracking-widest'}`}>
+          <h3 className={`intelligence-report-title text-2xl font-black mb-8 leading-tight tracking-tighter transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'} ${isNote ? 'border-l-4 border-indigo-600 pl-6' : 'text-center uppercase tracking-widest'}`}>
             {drop.title}
           </h3>
         )}

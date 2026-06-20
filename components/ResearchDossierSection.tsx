@@ -125,7 +125,7 @@ const FormattedText: React.FC<{ text: string; isDarkMode: boolean }> = ({ text, 
   }
   flushTable();
 
-  return <div className="space-y-4">{elements}</div>;
+  return <div className="intelligence-report-content space-y-2">{elements}</div>;
 };
 
 const ResearchDossierSection: React.FC<ResearchDossierSectionProps> = ({ 
@@ -232,7 +232,7 @@ const ResearchDossierSection: React.FC<ResearchDossierSectionProps> = ({
             </div>
             <div>
               <span className="text-[12px] font-black uppercase tracking-[0.4em] text-emerald-500 opacity-80 mb-1 block">Deep intelligence report</span>
-              <h3 className={`text-4xl font-black tracking-tighter leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{activeDrop.title}</h3>
+              <h3 className={`intelligence-report-title text-4xl font-black tracking-tighter leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{activeDrop.title}</h3>
             </div>
           </div>
           <button onClick={() => onRemove(activeDrop.id)} className="p-4 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all">

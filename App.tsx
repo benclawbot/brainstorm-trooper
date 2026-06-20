@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Sparkles, Image as ImageIcon, Globe, Loader2, MessageSquare, GitBranch, FileDown, Search, AlertCircle } from 'lucide-react';
+import { MessageSquare, GitBranch, FileDown, AlertCircle } from 'lucide-react';
 import { Drop, DropType, MindMapNode, Project, User, ResearchFolder, ProjectFolder, Language } from './types';
 import { expandIdea, researchIdea, generateVisual, generateDeepMindMap } from './services/minimaxService';
 import Header from './components/Header';
@@ -29,6 +29,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -56,15 +57,18 @@ const App: React.FC = () => {
     const savedSidebarState = localStorage.getItem('brainstorm_sidebar_collapsed');
     if (savedSidebarState === 'true') setIsSidebarCollapsed(true);
 
+    setHasHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!hasHydrated) return;
     localStorage.setItem('brainstorm_trooper_projects', JSON.stringify(projects));
-  }, [projects]);
+  }, [projects, hasHydrated]);
 
   useEffect(() => {
+    if (!hasHydrated) return;
     localStorage.setItem('brainstorm_trooper_project_folders', JSON.stringify(projectFolders));
-  }, [projectFolders]);
+  }, [projectFolders, hasHydrated]);
 
   // Calculate dynamic sidebar width based on maximum visible depth
   const sidebarWidth = useMemo(() => {
@@ -537,12 +541,6 @@ const App: React.FC = () => {
         activeProjectId={activeProjectId}
         onSelectProject={setActiveProjectId}
         onRemoveProject={removeProject}
-        onNewProject={() => {
-          setActiveProjectId(null);
-          setInputValue('');
-          setError(null);
-          setActiveResearchId(null);
-        }}
         onAddFolder={addProjectFolder}
         onRenameFolder={renameProjectFolder}
         onDeleteFolder={deleteProjectFolder}
@@ -571,28 +569,16 @@ const App: React.FC = () => {
         
         <main className="flex-1 flex overflow-hidden relative">
           {!activeProject ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.1),transparent_70%)]" />
-              <div className="w-full max-w-3xl text-center space-y-12 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                <div className="space-y-4">
-                  <div className="p-4 bg-indigo-600/10 rounded-3xl w-fit mx-auto mb-6 border border-indigo-500/20 shadow-2xl shadow-indigo-500/10">
-                    <Sparkles className="w-10 h-10 text-indigo-400 animate-pulse" />
-                  </div>
-                  <h2 className={`text-5xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'} tracking-tighter sm:text-6xl transition-colors`}>
-                    {selectedLanguage === 'fr' ? 'Architecturez votre ' : 'Architect your '}
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-                      {selectedLanguage === 'fr' ? 'flux de pensée.' : 'thought stream.'}
-                    </span>
-                  </h2>
-                  <p className="text-xl text-slate-500 font-medium max-w-xl mx-auto leading-relaxed">
-                    {selectedLanguage === 'fr' ? 'Le hub d\'intelligence dans l\'en-tête est prêt pour votre première idée.' : 'The intelligence hub in the header is ready for your first drop.'}
-                  </p>
-                </div>
-              </div>
+            <div className="empty-workspace-hero flex-1 relative overflow-hidden" aria-label="Brainstorm Trooper">
+              <img
+                src="/assets/hero-banner.jpeg"
+                alt="Brainstorm Trooper"
+                className="empty-workspace-hero-image"
+              />
             </div>
           ) : (
-            <div className="flex-1 flex overflow-hidden">
-              <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative">
+            <div className="workspace-three-panel flex-1 flex flex-row-reverse overflow-hidden">
+              <div ref={scrollContainerRef} className={`workspace-streams-panel overflow-y-auto p-4 custom-scrollbar relative border-l ${isDarkMode ? 'border-white/5 bg-[#0a0f1d]/80' : 'border-slate-200 bg-slate-50/90'}`}>
                 <div className={`flex justify-between items-center mb-10 sticky top-0 z-20 ${isDarkMode ? 'bg-[#0a0f1d]/80' : 'bg-slate-50/80'} backdrop-blur-md py-4 transition-colors`}>
                   <div className="flex items-center gap-4">
                     <div className="p-2 bg-indigo-600/10 rounded-xl border border-indigo-500/20">

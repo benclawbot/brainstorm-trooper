@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CloudRain, Moon, Sun, Sparkles, Image as ImageIcon, Globe, Loader2, Languages } from 'lucide-react';
+import { CloudRain, Moon, Sun, Sparkles, Image as ImageIcon, Globe, Loader2 } from 'lucide-react';
 import { User, DropType, Language } from '../types';
 
 interface HeaderProps {
@@ -109,20 +109,6 @@ const Header: React.FC<HeaderProps> = ({
           {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
 
-        {user && (
-          <div className={`flex items-center gap-3 pl-4 border-l ${isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
-            <div className="text-right hidden sm:block">
-              <p className={`text-xs font-black leading-none mb-1 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{user.name.split(' ')[0]}</p>
-              <div className="flex items-center gap-1 justify-end">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[8px] font-black uppercase text-slate-500 tracking-tighter">Live</span>
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-xl border border-white/10 overflow-hidden ring-2 ring-indigo-500/10 hover:ring-indigo-500/40 transition-all shadow-xl">
-              <img src={user.photoUrl} alt={user.name} className="w-full h-full object-cover" />
-            </div>
-          </div>
-        )}
       </div>
     </header>
   );

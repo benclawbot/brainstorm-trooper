@@ -138,3 +138,106 @@ textarea:focus-visible {
   outline: 2px solid rgba(141, 108, 255, 0.82);
   outline-offset: 2px;
 }
+
+.workspace-three-panel {
+  min-width: 0;
+}
+
+.workspace-streams-panel {
+  flex: 0 0 40%;
+  min-width: 320px;
+  max-width: 44%;
+}
+
+.mind-map-center-panel {
+  width: auto;
+}
+
+.workspace-streams-panel .intelligence-report-title {
+  font-family: inherit;
+  font-size: 0.875rem !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em !important;
+  text-align: left !important;
+  text-transform: none !important;
+}
+
+.workspace-streams-panel .intelligence-report-content {
+  font-size: 0.875rem;
+  line-height: 1.625;
+}
+
+.workspace-streams-panel .intelligence-report-content p,
+.workspace-streams-panel .intelligence-report-content td {
+  font-size: 0.875rem !important;
+  line-height: 1.625 !important;
+}
+
+.workspace-streams-panel .intelligence-report-content h4 {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.4rem !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.8rem !important;
+  line-height: 1.35 !important;
+}
+
+.workspace-streams-panel .intelligence-report-content h5,
+.workspace-streams-panel .intelligence-report-content th {
+  font-size: 0.625rem !important;
+  line-height: 1.4 !important;
+}
+
+.workspace-streams-panel .intelligence-report-content table th,
+.workspace-streams-panel .intelligence-report-content table td {
+  padding: 0.65rem 0.75rem !important;
+}
+
+@media (max-width: 1050px) {
+  .workspace-streams-panel {
+    flex-basis: 44%;
+    min-width: 290px;
+    max-width: 48%;
+  }
+}
+
+.empty-workspace-hero {
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  padding: clamp(28px, 5vw, 72px);
+  background: var(--bg-color);
+}
+
+.empty-workspace-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, var(--bg-color) 0%, transparent 5%, transparent 95%, var(--bg-color) 100%),
+    linear-gradient(180deg, var(--bg-color) 0%, transparent 6%, transparent 94%, var(--bg-color) 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.empty-workspace-hero::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(ellipse at center, transparent 76%, rgba(7, 11, 18, 0.08) 91%, rgba(7, 11, 18, 0.42) 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.empty-workspace-hero-image {
+  display: block;
+  width: auto;
+  max-width: min(100%, 1180px);
+  height: auto;
+  max-height: calc(100% - 8px);
+  border-radius: 12px;
+  object-fit: contain;
+  object-position: center;
+  filter: saturate(0.96) brightness(0.96);
+  mask-image: radial-gradient(ellipse 104% 104% at center, #000 88%, rgba(0, 0, 0, 0.82) 96%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 104% 104% at center, #000 88%, rgba(0, 0, 0, 0.82) 96%, transparent 100%);
+}

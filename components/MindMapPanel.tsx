@@ -403,7 +403,7 @@ ${nodeToFreeMindXml(rootNode)}
 
   return (
     <aside 
-      className={`w-[45%] border-l flex flex-col transition-colors duration-300 z-10 ${isDarkMode ? 'bg-[#0d111d] border-white/5 shadow-[-40px_0_80px_rgba(0,0,0,0.4)]' : 'bg-white border-slate-200 shadow-[-20px_0_40px_rgba(0,0,0,0.05)]'}`}
+      className={`mind-map-center-panel flex-1 min-w-0 border-r flex flex-col transition-colors duration-300 z-10 ${isDarkMode ? 'bg-[#0d111d] border-white/5' : 'bg-white border-slate-200'}`}
     >
       <div className={`p-6 border-b flex items-center justify-between transition-colors ${isDarkMode ? 'border-white/5 bg-black/40' : 'border-slate-100 bg-slate-50/50'}`}>
         <div className="flex items-center gap-4">

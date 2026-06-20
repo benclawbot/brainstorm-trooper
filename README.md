@@ -2,6 +2,8 @@
 
 Brainstorm Trooper is a local-first React workspace for expanding ideas, creating mind maps, producing research-style dossiers, generating visual concept cards, and discussing the current workspace with MiniMax M3.
 
+![Brainstorm Trooper showing a research dossier and expanded mind map](docs/images/brainstorm-trooper-research-mind-map.png)
+
 Google authentication and Firebase are not used. Projects and folders are stored locally in the browser.
 
 ## Local setup

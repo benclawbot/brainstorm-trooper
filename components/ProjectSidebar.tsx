@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Folder, Clock, LogOut, Trash2, FolderPlus, ChevronRight, ChevronDown, Edit2, Check, X, GripVertical, MoreVertical, Menu, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react';
+import { Plus, Folder, Clock, Trash2, FolderPlus, ChevronRight, ChevronDown, Edit2, Check, X, GripVertical, MoreVertical, Menu, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react';
 import { Project, User, ProjectFolder } from '../types';
 
 interface ProjectSidebarProps {
@@ -16,7 +16,7 @@ interface ProjectSidebarProps {
   onToggleFolder: (id: string) => void;
   onMoveToFolder: (projectId: string, folderId: string | null) => void;
   onMoveFolderToFolder: (folderId: string, parentId: string | null) => void;
-  onSignOut: () => void;
+  onResetWorkspace: () => void;
   user: User;
   isDarkMode: boolean;
   isCollapsed?: boolean;
@@ -37,7 +37,7 @@ const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   onToggleFolder,
   onMoveToFolder,
   onMoveFolderToFolder,
-  onSignOut,
+  onResetWorkspace,
   user,
   isDarkMode,
   isCollapsed = false,
@@ -369,11 +369,11 @@ const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
           </div>
           {!isCollapsed && (
             <button 
-              onClick={onSignOut}
+              onClick={onResetWorkspace}
               className={`p-2.5 rounded-xl transition-all ${isDarkMode ? 'text-slate-500 hover:text-red-400 hover:bg-red-400/10' : 'text-slate-400 hover:text-red-600 hover:bg-slate-100'}`}
-              title="Sign Out"
+              title="Clear Local Workspace"
             >
-              <LogOut className="w-4.5 h-4.5" />
+              <Trash2 className="w-4.5 h-4.5" />
             </button>
           )}
         </div>

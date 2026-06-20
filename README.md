@@ -1,20 +1,43 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Brainstorm Trooper
 
-# Run and deploy your AI Studio app
+Brainstorm Trooper is a local-first React workspace for expanding ideas, creating mind maps, producing research-style dossiers, generating visual concept cards, and discussing the current workspace with MiniMax M3.
 
-This contains everything you need to run your app locally.
+Google authentication and Firebase are not used. Projects and folders are stored locally in the browser.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1OrlsEhhEG4E-ACZqzAUcUiEBI9VbMTZk
+## Local setup
 
-## Run Locally
+Requirements: Node.js and a MiniMax key named `MINIMAX_API_KEY`.
 
-**Prerequisites:**  Node.js
+This installation reuses the key already configured in:
 
+```text
+C:\Users\thoma\.hermes\.env
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Start the installed app from PowerShell:
+
+```powershell
+.\Start-BrainstormTrooper.ps1
+```
+
+Then open `http://localhost:3002`.
+
+For a different environment, set the key directly before starting:
+
+```powershell
+$env:MINIMAX_API_KEY = "your_key"
+npm run dev
+```
+
+## Verification
+
+```powershell
+npm test
+npm run build
+```
+
+The provider contract uses model `MiniMax-M3` and the OpenAI-compatible endpoint `https://api.minimax.io/v1/chat/completions`.
+
+## Security
+
+This remains a browser-only local application. Vite injects `MINIMAX_API_KEY` into the browser bundle, so use it only on a trusted machine. A public deployment should move MiniMax requests behind a server-side proxy.

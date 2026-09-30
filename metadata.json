@@ -1,6 +1,6 @@
 {
   "name": "Brainstorm Trooper",
-  "description": "A local-first brainstorming workspace powered by MiniMax M3 for idea expansion, research dossiers, visual concepts, and interactive mind maps.",
+  "description": "A local-first brainstorming workspace powered by GPT-6.1 Sol for idea expansion, research dossiers, relationship diagrams, and interactive mind maps.",
   "requestFramePermissions": [
     "microphone"
   ]

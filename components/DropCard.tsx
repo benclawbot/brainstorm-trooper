@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Trash2, ExternalLink, Hash, Clock, FileText, Image as ImageIcon, Search, GitBranch, Quote, Link as LinkIcon } from 'lucide-react';
+import RelationshipDiagram from './RelationshipDiagram';
 import { Drop } from '../types';
 
 interface DropCardProps {
@@ -154,6 +155,7 @@ const DropCard: React.FC<DropCardProps> = ({ drop, onRemove, onStartMindMap, isD
           </h3>
         )}
 
+        {drop.diagram && <RelationshipDiagram diagram={drop.diagram} />}
         {drop.imageUrl && (
           <div className="mb-10 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl transition-transform group-hover:scale-[1.02] duration-700">
             <img src={drop.imageUrl} alt={drop.content} className="w-full object-cover max-h-96" />

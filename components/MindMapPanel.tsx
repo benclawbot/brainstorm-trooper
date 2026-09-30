@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Trash2, ChevronRight, Edit3, Loader2, Download, ChevronDown, ChevronUp, GitBranch, Globe, X, Layers } from 'lucide-react';
 import { MindMapNode, Drop, Language } from '../types';
-import { suggestSubBranches, researchIdea } from '../services/minimaxService';
+import { suggestSubBranches, researchIdea } from '../services/openaiService';
 
 interface MindMapPanelProps {
   isOpen: boolean;
@@ -184,6 +184,8 @@ const NodeComponent: React.FC<{
 };
 
 const MindMapPanel: React.FC<MindMapPanelProps> = ({ isOpen, onClose, rootNode, onUpdate, onAddSearchDrop, isDarkMode, selectedLanguage }) => {
+  const [aiError, setAiError] = useState('');
+  const [researchPending, setResearchPending] = useState(false);
   const [expansionLevel, setExpansionLevel] = useState(1);
   const [isAutoExpanding, setIsAutoExpanding] = useState(false);
   const rootNodeRef = useRef(rootNode);
@@ -265,6 +267,8 @@ const MindMapPanel: React.FC<MindMapPanelProps> = ({ isOpen, onClose, rootNode, 
   };
 
   const handleAIExpand = async (nodeId: string, text: string) => {
+    setAiError('');
+    try {
     const suggestions = await suggestSubBranches(text, [rootNodeRef.current?.text || ''], selectedLanguage);
     if (suggestions.length > 0) {
       const newNodes: MindMapNode[] = suggestions.map((s: string) => ({
@@ -281,9 +285,13 @@ const MindMapPanel: React.FC<MindMapPanelProps> = ({ isOpen, onClose, rootNode, 
         children: [...node.children, ...newNodes]
       })));
     }
+    } catch (error) { setAiError(error instanceof Error ? error.message : 'Branch expansion failed.'); }
   };
 
   const handleNodeResearch = async (text: string) => {
+    if (researchPending) return;
+    setResearchPending(true);
+    setAiError('');
     try {
       const research = await researchIdea(text, selectedLanguage);
       const newDrop: Drop = {
@@ -292,12 +300,15 @@ const MindMapPanel: React.FC<MindMapPanelProps> = ({ isOpen, onClose, rootNode, 
         title: text,
         content: research.text,
         links: research.links,
+        researchedAt: research.researchedAt,
         tags: ['Architect Discovery', text.split(' ')[0]],
         createdAt: Date.now()
       };
       onAddSearchDrop(newDrop);
     } catch (error) {
-      console.error("Research failed for node", error);
+      setAiError(error instanceof Error ? error.message : 'Research could not finish.');
+    } finally {
+      setResearchPending(false);
     }
   };
 
@@ -368,7 +379,7 @@ const MindMapPanel: React.FC<MindMapPanelProps> = ({ isOpen, onClose, rootNode, 
           await new Promise(r => setTimeout(r, 150));
         }
       } catch (e) {
-        console.error("Auto expansion failed", e);
+        setAiError(e instanceof Error ? e.message : 'Expansion could not finish.');
       } finally {
         setIsAutoExpanding(false);
       }
@@ -456,6 +467,8 @@ ${nodeToFreeMindXml(rootNode)}
         </div>
       </div>
 
+      {aiError && <p role="alert" className="px-6 py-3 text-red-400 text-sm">{aiError}</p>}
+      {researchPending && <p role="status" className="px-6 py-3 text-indigo-400 text-sm">Searching sources…</p>}
       <div className={`flex-1 overflow-auto p-10 custom-scrollbar ${isDarkMode ? 'bg-[radial-gradient(circle_at_100%_0%,rgba(99,102,241,0.03),transparent_50%)]' : 'bg-white'}`}>
         <div className="min-w-max pb-32">
           <NodeComponent 

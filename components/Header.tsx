@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => onAddDrop('note')} 
                   disabled={loading || !inputValue}
                   className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-indigo-400 hover:bg-indigo-500/10' : 'text-indigo-600 hover:bg-indigo-50'}`}
-                  title="Expand Idea"
+                  title="Expand Idea" aria-label="Expand Idea"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                 </button>
@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => onAddDrop('image')} 
                   disabled={loading || !inputValue}
                   className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-pink-400 hover:bg-pink-500/10' : 'text-pink-600 hover:bg-pink-50'}`}
-                  title="Generate M3 Visual Concept"
+                  title="Generate Relationship Diagram" aria-label="Generate Relationship Diagram"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
@@ -74,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => onAddDrop('search')} 
                   disabled={loading || !inputValue}
                   className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-emerald-400 hover:bg-emerald-500/10' : 'text-emerald-600 hover:bg-emerald-50'}`}
-                  title="Generate Research Dossier"
+                  title="Generate Research Dossier" aria-label="Generate Research Dossier"
                 >
                   <Globe className="w-4 h-4" />
                 </button>

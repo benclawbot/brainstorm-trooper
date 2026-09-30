@@ -9,7 +9,9 @@ export interface Drop {
   title?: string;
   tags: string[];
   imageUrl?: string;
-  links?: { title: string; url: string }[];
+  links?: ResearchSource[];
+  researchedAt?: string;
+  diagram?: Diagram;
   createdAt: number;
   folderId?: string;
 }
@@ -56,4 +58,28 @@ export interface User {
   name: string;
   email: string;
   photoUrl: string;
+}
+
+export interface ResearchSource {
+  title: string;
+  url: string;
+  retrievedAt?: string;
+}
+export interface ResearchResult {
+  text: string;
+  links: ResearchSource[];
+  researchedAt: string;
+}
+export interface MapEdit {
+  type: 'add' | 'rename' | 'move' | 'remove';
+  nodeId: string;
+  parentId: string | null;
+  text: string | null;
+  reason: string;
+}
+export interface ChatReply { text: string; edits: MapEdit[]; }
+export interface Diagram {
+  title: string;
+  nodes: { id: string; label: string; detail: string }[];
+  edges: { from: string; to: string; label: string }[];
 }

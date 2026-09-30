@@ -1,8 +1,10 @@
 
+import { flushSync } from 'react-dom';
+import { registerWorkspaceTools, WorkspaceToolContext } from './services/webmcp';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { MessageSquare, GitBranch, FileDown, AlertCircle } from 'lucide-react';
 import { Drop, DropType, MindMapNode, Project, User, ResearchFolder, ProjectFolder, Language } from './types';
-import { expandIdea, researchIdea, generateVisual, generateDeepMindMap } from './services/minimaxService';
+import { expandIdea, researchIdea, generateVisual, generateDeepMindMap } from './services/openaiService';
 import Header from './components/Header';
 import DropBoard from './components/DropBoard';
 import AIChatPanel from './components/AIChatPanel';
@@ -25,11 +27,14 @@ const App: React.FC = () => {
   const [isMindMapOpen, setIsMindMapOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [aiConfigured, setAiConfigured] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
+
+  useEffect(() => { fetch('/api/status').then(r => r.json()).then(data => setAiConfigured(data.configured)).catch(() => setAiConfigured(false)); }, []);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +133,11 @@ const App: React.FC = () => {
   };
 
   const activeProject = projects.find(p => p.id === activeProjectId) || null;
+
+  useEffect(() => {
+    const context = (document as Document & {modelContext?: WorkspaceToolContext}).modelContext;
+    return registerWorkspaceTools(context, () => activeProject, topic => flushSync(() => setInputValue(topic)));
+  }, [activeProject]);
 
   useEffect(() => {
     if (activeProject) {
@@ -302,14 +312,15 @@ const App: React.FC = () => {
         };
         titleForMindMap = expanded.title;
       } else if (type === 'image') {
-        const url = await generateVisual(text);
-        if (url) {
+        const diagram = await generateVisual(text, selectedLanguage);
+        if (diagram) {
           firstDrop = {
             id: Date.now().toString(),
             type: 'image',
             content: text,
-            imageUrl: url,
-            tags: ['MiniMax M3 Visual Concept'],
+            diagram,
+            title: diagram.title,
+            tags: ['Relationship diagram'],
             createdAt: Date.now()
           };
         }
@@ -321,7 +332,8 @@ const App: React.FC = () => {
           title: text,
           content: research.text,
           links: research.links,
-          tags: ['MiniMax M3 Research'],
+          researchedAt: research.researchedAt,
+          tags: ['Web research · GPT-6.1 Sol'],
           createdAt: Date.now()
         };
       }
@@ -330,7 +342,7 @@ const App: React.FC = () => {
         if (!activeProject) {
           const mindMapTask = generateDeepMindMap(titleForMindMap, selectedLanguage);
           const newId = 'proj-' + Date.now();
-          const deepRoot = await mindMapTask;
+          const deepRoot = await mindMapTask.catch(err => { setError(`The idea was saved, but its map could not be created: ${err.message}`); return null; });
           
           const newProj: Project = {
             id: newId,
@@ -358,7 +370,7 @@ const App: React.FC = () => {
       console.error("Drop creation failed:", err);
       const msg = err.message || "An unexpected error occurred.";
       if (msg.toLowerCase().includes("key") || msg.toLowerCase().includes("not found")) {
-        setError("API Key Error: Please ensure you have selected a valid, active API key.");
+        setError(msg);
       } else {
         setError(`Processing failed: ${msg}`);
       }
@@ -368,8 +380,10 @@ const App: React.FC = () => {
     }
   };
 
+  const escapeHtml = (text: string) => text.replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c] || c));
+
   const formatTextForWord = (text: string) => {
-    const lines = text.split('\n');
+    const lines = escapeHtml(text).split('\n');
     let html = '';
     let tableRows: string[] = [];
 
@@ -439,7 +453,7 @@ const App: React.FC = () => {
     if (level === 3) prefix = '  - ';
     if (level > 3) prefix = '    ◦ ';
 
-    let html = `<div style="margin-left: ${indent}px;"><p style="${style}">${prefix}${node.text}</p></div>`;
+    let html = `<div style="margin-left: ${indent}px;"><p style="${style}">${prefix}${escapeHtml(node.text)}</p></div>`;
     if (node.children) {
       html += node.children.map(child => generateMindMapWordHtml(child, level + 1)).join('');
     }
@@ -449,7 +463,7 @@ const App: React.FC = () => {
   const exportToWord = () => {
     if (!activeProject) return;
     
-    const projectNameUpper = activeProject.name.toUpperCase();
+    const projectNameUpper = escapeHtml(activeProject.name.toUpperCase());
     const isFr = selectedLanguage === 'fr';
     
     let mindMapHtml = '';
@@ -466,7 +480,7 @@ const App: React.FC = () => {
     }
 
     let content = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${activeProject.name}</title>
+      <head><meta charset='utf-8'><title>${escapeHtml(activeProject.name)}</title>
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Segoe UI', 'Inter', Arial, sans-serif; line-height: 1.5; color: #1e293b; max-width: 800px; margin: auto; padding: 50px; }
@@ -501,15 +515,16 @@ const App: React.FC = () => {
         ${activeProject.drops.map(drop => `
           <div class="intel-module">
             <div class="module-header">
-              <h2 class="module-title">${drop.title || (isFr ? 'Contexte du module' : 'Intel Module Context')}</h2>
+              <h2 class="module-title">${escapeHtml(drop.title || (isFr ? 'Contexte du module' : 'Intel Module Context'))}</h2>
             </div>
             <div style="padding: 0 5px;">
               ${formatTextForWord(drop.content)}
+              ${drop.diagram ? formatTextForWord("## " + drop.diagram.title + "\n" + drop.diagram.nodes.map(node => "- " + node.label + ": " + node.detail).join("\n") + "\n" + drop.diagram.edges.map(edge => "- " + (drop.diagram.nodes.find(n => n.id === edge.from)?.label || edge.from) + " — " + edge.label + " — " + (drop.diagram.nodes.find(n => n.id === edge.to)?.label || edge.to)).join("\n")) : ""}
             </div>
             ${drop.links && drop.links.length > 0 ? `
               <div class="source-box">
                 <div class="source-label">${isFr ? 'Vérification des sources d\'intelligence' : 'Intelligence Sources Verification'}:</div>
-                ${drop.links.map(l => `<a href="${l.url}" class="source-link">Source: ${l.title}</a>`).join('')}
+                ${drop.links.filter(l => /^https?:\/\//i.test(l.url)).map(l => `<a href="${escapeHtml(l.url)}" class="source-link">Source: ${escapeHtml(l.title)}</a>`).join('')}
               </div>
             ` : ''}
           </div>
@@ -567,6 +582,8 @@ const App: React.FC = () => {
           onLanguageChange={handleLanguageChange}
         />
         
+        {aiConfigured === false && <div role="status" className="connection-status">{selectedLanguage === 'fr' ? 'IA non connectée. La clé OpenAI doit être configurée côté serveur pour activer l’assistant.' : 'AI is not connected yet. An OpenAI key must be configured on the server to enable the assistant.'}</div>}
+        {error && !activeProject && <div role="alert" className="connection-status text-red-400">{error}</div>}
         <main className="flex-1 flex overflow-hidden relative">
           {!activeProject ? (
             <div className="empty-workspace-hero flex-1 relative overflow-hidden" aria-label="Brainstorm Trooper">
@@ -637,11 +654,11 @@ const App: React.FC = () => {
                 />
               )}
 
-              <AIChatPanel isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} drops={activeProject?.drops || []} isDarkMode={isDarkMode} />
+              <AIChatPanel key={activeProject.id} lang={selectedLanguage} mindMap={activeProject.mindMapRoot} onApplyMap={root => updateActiveProject(p => ({...p, mindMapRoot: root}))} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} drops={activeProject?.drops || []} isDarkMode={isDarkMode} />
 
               <div className="fixed right-6 bottom-8 flex flex-col gap-4 z-50">
                 {!isSidebarOpen && (
-                  <button onClick={() => setIsSidebarOpen(true)} className="p-4 bg-indigo-600 hover:bg-indigo-500 rounded-full shadow-[0_15px_30px_rgba(79,70,229,0.3)] transition-all hover:scale-110">
+                  <button aria-label="Open project assistant" onClick={() => setIsSidebarOpen(true)} className="p-4 bg-indigo-600 hover:bg-indigo-500 rounded-full shadow-[0_15px_30px_rgba(79,70,229,0.3)] transition-all hover:scale-110">
                     <MessageSquare className="w-6 h-6 text-white" />
                   </button>
                 )}

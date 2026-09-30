@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Search, Link as LinkIcon, ExternalLink, Trash2, ChevronRight, Folder, Plus, Edit2, Check, X, FolderOpen, GripVertical, Archive, Library } from 'lucide-react';
-import { Drop, ResearchFolder } from '../types';
+import SourceInline, { safeSourceUrl } from './SourceInline';
+import { Drop, ResearchFolder, ResearchSource } from '../types';
 
 interface ResearchDossierSectionProps {
   activeId: string | null;
@@ -16,17 +17,9 @@ interface ResearchDossierSectionProps {
   isDarkMode: boolean;
 }
 
-const renderInlines = (text: string, isDarkMode: boolean) => {
-  const parts = text.split(/(\*\*.*?\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className={`${isDarkMode ? 'text-white' : 'text-slate-950'} font-extrabold`}>{part.slice(2, -2)}</strong>;
-    }
-    return part;
-  });
-};
+const renderInlines = (text: string, isDarkMode: boolean, links: ResearchSource[] = []) => <SourceInline text={text} links={links}/>;
 
-const FormattedText: React.FC<{ text: string; isDarkMode: boolean }> = ({ text, isDarkMode }) => {
+const FormattedText: React.FC<{ text: string; isDarkMode: boolean; links?: ResearchSource[] }> = ({ text, isDarkMode, links = [] }) => {
   const lines = text.split('\n');
   const elements: React.ReactNode[] = [];
   let tableRows: string[] = [];
@@ -47,7 +40,7 @@ const FormattedText: React.FC<{ text: string; isDarkMode: boolean }> = ({ text, 
                 <tr className={`border-b ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-slate-50'}`}>
                   {dataRows[0].map((cell, idx) => (
                     <th key={idx} className={`px-6 py-5 text-left font-black uppercase tracking-widest text-xs ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                      {renderInlines(cell, isDarkMode)}
+                      {renderInlines(cell, isDarkMode, links)}
                     </th>
                   ))}
                 </tr>
@@ -57,7 +50,7 @@ const FormattedText: React.FC<{ text: string; isDarkMode: boolean }> = ({ text, 
                   <tr key={rIdx} className={`border-b last:border-0 hover:bg-slate-400/5 transition-colors ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
                     {row.map((cell, cIdx) => (
                       <td key={cIdx} className={`px-6 py-5 font-medium leading-relaxed ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                        {renderInlines(cell, isDarkMode)}
+                        {renderInlines(cell, isDarkMode, links)}
                       </td>
                     ))}
                   </tr>
@@ -106,7 +99,7 @@ const FormattedText: React.FC<{ text: string; isDarkMode: boolean }> = ({ text, 
           <div key={i} className="flex gap-4 items-start py-2">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2.5 shrink-0 shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
             <p className={`text-lg leading-relaxed flex-1 font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-              {renderInlines(content, isDarkMode)}
+              {renderInlines(content, isDarkMode, links)}
             </p>
           </div>
         );
@@ -117,7 +110,7 @@ const FormattedText: React.FC<{ text: string; isDarkMode: boolean }> = ({ text, 
       } else {
         elements.push(
           <p key={i} className={`text-lg leading-relaxed font-medium mb-2 ${isDarkMode ? 'text-slate-300 opacity-90' : 'text-slate-700'}`}>
-            {renderInlines(line, isDarkMode)}
+            {renderInlines(line, isDarkMode, links)}
           </p>
         );
       }
@@ -242,23 +235,24 @@ const ResearchDossierSection: React.FC<ResearchDossierSectionProps> = ({
 
         <div className="p-12 lg:p-20">
           <div className="max-w-4xl mx-auto">
-             <FormattedText text={activeDrop.content} isDarkMode={isDarkMode} />
+             {activeDrop.researchedAt && <p className="research-stamp">Web research · {new Date(activeDrop.researchedAt).toLocaleString()} · GPT-6.1 Sol</p>}
+             <FormattedText links={activeDrop.links} text={activeDrop.content} isDarkMode={isDarkMode} />
           </div>
 
           {activeDrop.links && activeDrop.links.length > 0 && (
             <div className={`mt-20 pt-10 border-t space-y-8 max-w-4xl mx-auto ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
               <div className="flex items-center gap-4 text-[11px] font-black text-emerald-500 opacity-80 uppercase tracking-[0.5em]">
                 <LinkIcon className="w-5 h-5" />
-                Dossier intelligence sources
+                Sources consulted
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeDrop.links.map((link, idx) => (
-                  <a key={idx} href={link.url} target="_blank" rel="noreferrer" className={`flex items-center justify-between gap-4 px-8 py-6 rounded-3xl border hover:border-emerald-500 transition-all group/link shadow-xl ${isDarkMode ? 'bg-white/[0.02] border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+                  <a key={idx} href={safeSourceUrl(link.url)} target="_blank" rel="noreferrer" className={`flex items-center justify-between gap-4 px-8 py-6 rounded-3xl border hover:border-emerald-500 transition-all group/link shadow-xl ${isDarkMode ? 'bg-white/[0.02] border-white/5' : 'bg-slate-50 border-slate-100'}`}>
                     <div className="flex items-center gap-4 min-w-0">
                       <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
                         <span className="text-xs font-black text-emerald-500">{idx + 1}</span>
                       </div>
-                      <span className={`truncate font-bold tracking-tight text-base group-hover/link:text-emerald-600 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{link.title}</span>
+                      <span className={`font-bold tracking-tight text-base group-hover/link:text-emerald-600 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{link.title}<small className="block font-normal text-sm mt-1 text-slate-400">{safeSourceUrl(link.url) ? new URL(link.url).hostname : ""}</small></span>
                     </div>
                     <ExternalLink className="w-5 h-5 text-emerald-500/30 group-hover/link:text-emerald-500" />
                   </a>

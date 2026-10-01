@@ -8,7 +8,8 @@ The SDK is distributed as a local workspace rather than a registry package.
 Its license and third-party notices are included in the archive.
 
 Brainstorm Trooper adds `responseOptions` to `StreamResponseOptions` and returns
-the final `response.completed.response` alongside text. These two additions let
+the final `response.completed.response` alongside text. Completed stream items
+are retained when the final response envelope omits its output. These additions let
 the app retain structured outputs, low reasoning effort, and web-search citations.
 The SDK still controls `store: false`, `stream: true`, OAuth, identity validation,
 encrypted storage, refresh, and completion checks. No credentials are bundled.

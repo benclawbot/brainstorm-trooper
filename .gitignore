@@ -27,3 +27,4 @@ dist-ssr
 
 !.env.example
 .sites-runtime
+.brainstorm-auth/

@@ -10,6 +10,6 @@ for(const file of clientFiles.filter(file=>/\.(js|html)$/.test(file))){
 const worker=await import('../dist/server/index.js');
 assert.equal(typeof worker.default?.fetch,'function','Worker must expose fetch');
 const response=await worker.default.fetch(new Request('https://example.test/api/status'),{});
-assert.deepEqual(await response.json(),{configured:false,model:'gpt-6.1-sol',reasoningEffort:'low'});
+assert.deepEqual(await response.json(),{configured:false,oauthAvailable:false,model:'gpt-6.1-sol',reasoningEffort:'low'});
 assert.deepEqual(JSON.parse(readFileSync('dist/.openai/hosting.json','utf8')),JSON.parse(readFileSync('.openai/hosting.json','utf8')));
 console.log('Build verified: Worker entrypoint, hosting identity, and client credential isolation.');

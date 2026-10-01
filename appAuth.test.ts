@@ -15,10 +15,10 @@ describe('local no-auth application shell', () => {
     expect(app).toContain("name: 'Local Architect'");
   });
 
-  it('keeps the OpenAI key on the server side', () => {
+  it('keeps the OAuth connection in the local server', () => {
     const viteConfig = read('./vite.config.ts');
 
-    expect(viteConfig).toContain('handleAi');
+    expect(viteConfig).toContain('createLocalOAuth');
     expect(viteConfig).not.toContain('define:');
     expect(read('./services/openaiService.ts')).not.toMatch(/API_KEY|Authorization|api.openai.com/);
     expect(viteConfig).not.toMatch(/GEMINI_API_KEY|process\.env\.API_KEY/);

@@ -11,6 +11,7 @@ import AIChatPanel from './components/AIChatPanel';
 import MindMapPanel from './components/MindMapPanel';
 import ProjectSidebar from './components/ProjectSidebar';
 import ResearchDossierSection from './components/ResearchDossierSection';
+import ChatGPTConnection from './components/ChatGPTConnection';
 
 const App: React.FC = () => {
   const user: User = {
@@ -27,14 +28,12 @@ const App: React.FC = () => {
   const [isMindMapOpen, setIsMindMapOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [aiConfigured, setAiConfigured] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
 
-  useEffect(() => { fetch('/api/status').then(r => r.json()).then(data => setAiConfigured(data.configured)).catch(() => setAiConfigured(false)); }, []);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -582,7 +581,7 @@ const App: React.FC = () => {
           onLanguageChange={handleLanguageChange}
         />
         
-        {aiConfigured === false && <div role="status" className="connection-status">{selectedLanguage === 'fr' ? 'IA non connectée. La clé OpenAI doit être configurée côté serveur pour activer l’assistant.' : 'AI is not connected yet. An OpenAI key must be configured on the server to enable the assistant.'}</div>}
+        <ChatGPTConnection lang={selectedLanguage}/>
         {error && !activeProject && <div role="alert" className="connection-status text-red-400">{error}</div>}
         <main className="flex-1 flex overflow-hidden relative">
           {!activeProject ? (
